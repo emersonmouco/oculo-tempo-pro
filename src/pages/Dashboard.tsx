@@ -1,14 +1,18 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { 
-  ShoppingCart, 
+  TrendingUp, 
   Users, 
   Package, 
-  TrendingUp,
+  ShoppingCart,
+  Eye,
+  Plus,
+  Calendar,
   Clock,
-  Wrench,
-  AlertCircle,
-  CheckCircle2
+  ArrowUpRight,
+  Activity,
+  DollarSign
 } from "lucide-react";
 
 const Dashboard = () => {

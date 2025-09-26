@@ -12,7 +12,10 @@ import {
   Clock,
   ArrowUpRight,
   Activity,
-  DollarSign
+  DollarSign,
+  Wrench,
+  AlertCircle,
+  CheckCircle2
 } from "lucide-react";
 
 const Dashboard = () => {

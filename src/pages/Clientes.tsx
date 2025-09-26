@@ -111,15 +111,15 @@ const Clientes = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">Clientes</h1>
-          <p className="text-muted-foreground">Gerencie seus clientes e histórico de compras</p>
+          <h1 className="text-3xl font-bold text-foreground">Fornecedores</h1>
+          <p className="text-muted-foreground">Gerencie seus fornecedores cadastrados</p>
         </div>
         <Button 
           className="erp-button-primary flex items-center gap-2"
           onClick={() => setShowForm(true)}
         >
           <UserPlus className="h-4 w-4" />
-          Novo Cliente
+          Novo Fornecedor
         </Button>
       </div>
 
@@ -129,12 +129,12 @@ const Clientes = () => {
           <div className="flex gap-4">
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input 
-                placeholder="Buscar por nome, empresa, email, telefone ou CNPJ..." 
-                className="pl-9"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
+            <Input 
+              placeholder="Buscar fornecedores..." 
+              className="pl-9"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
             </div>
             <Button variant="outline">Filtros</Button>
           </div>
@@ -145,8 +145,8 @@ const Clientes = () => {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
-            <span>Clientes Cadastrados</span>
-            <Badge variant="secondary">{filteredClients.length} clientes</Badge>
+            <span>Fornecedores Cadastrados</span>
+            <Badge variant="secondary">{filteredClients.length} fornecedores</Badge>
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -157,7 +157,7 @@ const Clientes = () => {
           ) : filteredClients.length === 0 ? (
             <div className="text-center py-8">
               <p className="text-muted-foreground">
-                {searchTerm ? "Nenhum cliente encontrado com os critérios de busca." : "Nenhum cliente cadastrado ainda."}
+                {searchTerm ? "Nenhum fornecedor encontrado com os critérios de busca." : "Nenhum fornecedor cadastrado ainda."}
               </p>
             </div>
           ) : (

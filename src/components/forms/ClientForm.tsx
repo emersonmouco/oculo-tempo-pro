@@ -122,15 +122,15 @@ export function ClientForm() {
       if (legalPersonError) throw legalPersonError;
 
       toast({
-        title: "Cliente cadastrado com sucesso!",
-        description: "O cliente foi adicionado ao sistema.",
+        title: "Fornecedor cadastrado com sucesso!",
+        description: "O fornecedor foi adicionado ao sistema.",
       });
 
       form.reset();
     } catch (error) {
       console.error("Error creating client:", error);
       toast({
-        title: "Erro ao cadastrar cliente",
+        title: "Erro ao cadastrar fornecedor",
         description: "Ocorreu um erro ao salvar os dados. Tente novamente.",
         variant: "destructive",
       });
@@ -146,8 +146,8 @@ export function ClientForm() {
           <User className="h-6 w-6" />
         </div>
         <div>
-          <h1 className="text-3xl font-bold text-foreground">Cadastro de Cliente</h1>
-          <p className="text-muted-foreground">Adicione um novo cliente ao sistema</p>
+          <h1 className="text-3xl font-bold text-foreground">Cadastro de Fornecedor</h1>
+          <p className="text-muted-foreground">Adicione um novo fornecedor ao sistema</p>
         </div>
       </div>
 
@@ -411,7 +411,7 @@ export function ClientForm() {
                       render={({ field }) => (
                         <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3">
                           <div className="space-y-0.5">
-                            <FormLabel>Cliente Ativo</FormLabel>
+                            <FormLabel>Fornecedor Ativo</FormLabel>
                           </div>
                           <FormControl>
                             <Switch

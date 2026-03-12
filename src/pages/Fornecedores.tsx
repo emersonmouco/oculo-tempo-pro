@@ -12,11 +12,10 @@ import {
   Edit, 
   Phone, 
   Mail,
-  MapPin,
   ArrowLeft
 } from "lucide-react";
 
-interface Client {
+interface Fornecedor {
   id: string;
   person_id: string;
   company_name: string;
@@ -32,17 +31,17 @@ interface Client {
   };
 }
 
-const Clientes = () => {
-  const [clients, setClients] = useState<Client[]>([]);
+const Fornecedores = () => {
+  const [fornecedores, setFornecedores] = useState<Fornecedor[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
-    loadClients();
+    loadFornecedores();
   }, []);
 
-  const loadClients = async () => {
+  const loadFornecedores = async () => {
     try {
       const { data, error } = await supabase
         .from("legal_persons")
@@ -64,20 +63,20 @@ const Clientes = () => {
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      setClients(data || []);
+      setFornecedores(data || []);
     } catch (error) {
-      console.error("Error loading clients:", error);
+      console.error("Error loading fornecedores:", error);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const filteredClients = clients.filter(client =>
-    client.persons.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    client.company_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    client.persons.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    client.persons.mobile_phone.includes(searchTerm) ||
-    client.cnpj?.includes(searchTerm)
+  const filteredFornecedores = fornecedores.filter(fornecedor =>
+    fornecedor.persons.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    fornecedor.company_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    fornecedor.persons.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    fornecedor.persons.mobile_phone.includes(searchTerm) ||
+    fornecedor.cnpj?.includes(searchTerm)
   );
 
   const getStatusColor = (isActive: boolean) => {
@@ -129,32 +128,32 @@ const Clientes = () => {
           <div className="flex gap-4">
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input 
-              placeholder="Buscar fornecedores..." 
-              className="pl-9"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
+              <Input 
+                placeholder="Buscar fornecedores..." 
+                className="pl-9"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
             </div>
             <Button variant="outline">Filtros</Button>
           </div>
         </CardContent>
       </Card>
 
-      {/* Lista de Clientes */}
+      {/* Lista de Fornecedores */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
             <span>Fornecedores Cadastrados</span>
-            <Badge variant="secondary">{filteredClients.length} fornecedores</Badge>
+            <Badge variant="secondary">{filteredFornecedores.length} fornecedores</Badge>
           </CardTitle>
         </CardHeader>
         <CardContent>
           {isLoading ? (
             <div className="text-center py-8">
-              <p className="text-muted-foreground">Carregando clientes...</p>
+              <p className="text-muted-foreground">Carregando fornecedores...</p>
             </div>
-          ) : filteredClients.length === 0 ? (
+          ) : filteredFornecedores.length === 0 ? (
             <div className="text-center py-8">
               <p className="text-muted-foreground">
                 {searchTerm ? "Nenhum fornecedor encontrado com os critérios de busca." : "Nenhum fornecedor cadastrado ainda."}
@@ -162,57 +161,57 @@ const Clientes = () => {
             </div>
           ) : (
             <div className="space-y-4">
-              {filteredClients.map((client) => (
-                <div key={client.id} className="border border-border rounded-lg p-4 hover:bg-secondary/50 transition-colors">
+              {filteredFornecedores.map((fornecedor) => (
+                <div key={fornecedor.id} className="border border-border rounded-lg p-4 hover:bg-secondary/50 transition-colors">
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-2">
-                        <h3 className="font-semibold text-lg">{client.persons.name}</h3>
-                        <Badge className={getStatusColor(client.is_active)}>
-                          {getStatusText(client.is_active)}
+                        <h3 className="font-semibold text-lg">{fornecedor.persons.name}</h3>
+                        <Badge className={getStatusColor(fornecedor.is_active)}>
+                          {getStatusText(fornecedor.is_active)}
                         </Badge>
                       </div>
                       
                       <div className="mb-3">
                         <p className="text-sm font-medium text-foreground">
-                          {client.company_name}
-                          {client.trade_name && client.trade_name !== client.company_name && (
-                            <span className="text-muted-foreground"> ({client.trade_name})</span>
+                          {fornecedor.company_name}
+                          {fornecedor.trade_name && fornecedor.trade_name !== fornecedor.company_name && (
+                            <span className="text-muted-foreground"> ({fornecedor.trade_name})</span>
                           )}
                         </p>
                       </div>
                       
                       <div className="grid md:grid-cols-2 gap-4 text-sm">
                         <div className="space-y-2">
-                          {client.persons.email && (
+                          {fornecedor.persons.email && (
                             <div className="flex items-center gap-2 text-muted-foreground">
                               <Mail className="h-4 w-4" />
-                              {client.persons.email}
+                              {fornecedor.persons.email}
                             </div>
                           )}
                           <div className="flex items-center gap-2 text-muted-foreground">
                             <Phone className="h-4 w-4" />
-                            {client.persons.mobile_phone}
+                            {fornecedor.persons.mobile_phone}
                           </div>
-                          {client.persons.phone && (
+                          {fornecedor.persons.phone && (
                             <div className="flex items-center gap-2 text-muted-foreground">
                               <Phone className="h-4 w-4" />
-                              {client.persons.phone}
+                              {fornecedor.persons.phone}
                             </div>
                           )}
                         </div>
                         
                         <div className="space-y-2">
-                          {client.cnpj && (
+                          {fornecedor.cnpj && (
                             <div>
                               <span className="text-muted-foreground">CNPJ: </span>
-                              <span className="font-medium">{client.cnpj}</span>
+                              <span className="font-medium">{fornecedor.cnpj}</span>
                             </div>
                           )}
                           <div>
                             <span className="text-muted-foreground">Nascimento: </span>
                             <span className="font-medium">
-                              {new Date(client.persons.birth_date).toLocaleDateString('pt-BR')}
+                              {new Date(fornecedor.persons.birth_date).toLocaleDateString('pt-BR')}
                             </span>
                           </div>
                         </div>
@@ -238,4 +237,4 @@ const Clientes = () => {
   );
 };
 
-export default Clientes;
+export default Fornecedores;

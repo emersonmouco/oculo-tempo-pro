@@ -14,6 +14,32 @@ export type Database = {
   }
   public: {
     Tables: {
+      customers: {
+        Row: {
+          id: string
+          person_id: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          person_id: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          person_id?: string
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customers_person_id_fkey"
+            columns: ["person_id"]
+            isOneToOne: true
+            referencedRelation: "persons"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
       legal_persons: {
         Row: {
           business_activity_code: string | null
@@ -232,6 +258,98 @@ export type Database = {
             referencedRelation: "legal_persons"
             referencedColumns: ["id"]
           },
+        ]
+      }
+      sale_items: {
+        Row: {
+          id: string
+          sale_id: string
+          product_id: string
+          quantity: number
+          unit_price: number
+          subtotal: number
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          sale_id: string
+          product_id: string
+          quantity?: number
+          unit_price: number
+          subtotal: number
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          sale_id?: string
+          product_id?: string
+          quantity?: number
+          unit_price?: number
+          subtotal?: number
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sale_items_sale_id_fkey"
+            columns: ["sale_id"]
+            isOneToOne: false
+            referencedRelation: "sales"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sale_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      sales: {
+        Row: {
+          id: string
+          sale_number: string | null
+          person_id: string | null
+          total: number
+          status: string
+          payment_method: string | null
+          payment_details: string | null
+          seller_name: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          sale_number?: string | null
+          person_id?: string | null
+          total?: number
+          status?: string
+          payment_method?: string | null
+          payment_details?: string | null
+          seller_name?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          sale_number?: string | null
+          person_id?: string | null
+          total?: number
+          status?: string
+          payment_method?: string | null
+          payment_details?: string | null
+          seller_name?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sales_person_id_fkey"
+            columns: ["person_id"]
+            isOneToOne: false
+            referencedRelation: "persons"
+            referencedColumns: ["id"]
+          }
         ]
       }
     }

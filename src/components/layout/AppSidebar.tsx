@@ -38,8 +38,8 @@ const menuItems = [
     group: "principal"
   },
   {
-    title: "Clientes",
-    url: "/clientes",
+    title: "Fornecedores",
+    url: "/fornecedores",
     icon: Users,
     group: "principal"
   },

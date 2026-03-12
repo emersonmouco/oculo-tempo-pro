@@ -602,7 +602,7 @@ export function ClientForm() {
               ) : (
                 <>
                   <Save className="h-4 w-4 mr-2" />
-                  Salvar Cliente
+                  Salvar Fornecedor
                 </>
               )}
             </Button>

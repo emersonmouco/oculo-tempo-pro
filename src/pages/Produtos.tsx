@@ -3,6 +3,22 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { ProductForm } from "@/components/forms/ProductForm";
@@ -38,12 +54,15 @@ interface Product {
   is_active: boolean;
 }
 
+const PAGE_SIZE = 10;
+
 const Produtos = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [activeTab, setActiveTab] = useState("all");
+  const [page, setPage] = useState(1);
 
   useEffect(() => {
     loadProducts();
@@ -77,6 +96,16 @@ const Produtos = () => {
 
     return matchesSearch && matchesCategory;
   });
+
+  const totalPages = Math.ceil(filteredProducts.length / PAGE_SIZE);
+  const paginatedProducts = filteredProducts.slice(
+    (page - 1) * PAGE_SIZE,
+    page * PAGE_SIZE
+  );
+
+  useEffect(() => {
+    setPage(1);
+  }, [searchTerm, activeTab]);
 
   const getEstoqueColor = (estoque: number, minimo?: number) => {
     if (estoque === 0) return "status-cancelado";
@@ -186,79 +215,105 @@ const Produtos = () => {
                   </p>
                 </div>
               ) : (
-                <div className="space-y-4">
-                  {filteredProducts.map((product) => (
-                    <div key={product.id} className="border border-border rounded-lg p-4 hover:bg-secondary/50 transition-colors">
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-3 mb-2">
-                            <h3 className="font-semibold text-lg">
-                              {product.brand && product.model 
-                                ? `${product.brand} ${product.model}` 
-                                : product.name}
-                            </h3>
-                            {product.category && (
-                              <Badge variant="outline" className="capitalize">
-                                {product.category}
+                <>
+                  <div className="rounded-md border">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Produto</TableHead>
+                          <TableHead>Categoria</TableHead>
+                          <TableHead>SKU</TableHead>
+                          <TableHead>Estoque</TableHead>
+                          <TableHead>Preço</TableHead>
+                          <TableHead>Status</TableHead>
+                          <TableHead className="text-right">Ações</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {paginatedProducts.map((product) => (
+                          <TableRow key={product.id}>
+                            <TableCell>
+                              <div className="font-medium">
+                                {product.brand && product.model 
+                                  ? `${product.brand} ${product.model}` 
+                                  : product.name}
+                              </div>
+                              {product.color && (
+                                <div className="text-xs text-muted-foreground">{product.color}</div>
+                              )}
+                            </TableCell>
+                            <TableCell>
+                              {product.category && (
+                                <Badge variant="outline" className="capitalize">
+                                  {product.category}
+                                </Badge>
+                              )}
+                            </TableCell>
+                            <TableCell>{product.sku || "-"}</TableCell>
+                            <TableCell>
+                              <Badge className={getEstoqueColor(product.stock_quantity, product.min_stock_level)}>
+                                {product.stock_quantity}
                               </Badge>
-                            )}
-                            <Badge className={getEstoqueColor(product.stock_quantity, product.min_stock_level)}>
-                              Estoque: {product.stock_quantity}
-                            </Badge>
-                          </div>
-                          
-                          <div className="grid md:grid-cols-3 gap-4 text-sm">
-                            {product.sku && (
-                              <div>
-                                <span className="text-muted-foreground">SKU: </span>
-                                <span className="font-medium">{product.sku}</span>
-                              </div>
-                            )}
-                            {product.color && (
-                              <div>
-                                <span className="text-muted-foreground">Cor: </span>
-                                <span>{product.color}</span>
-                              </div>
-                            )}
-                            {product.size && (
-                              <div>
-                                <span className="text-muted-foreground">Tamanho: </span>
-                                <span>{product.size}</span>
-                              </div>
-                            )}
-                            {product.material && (
-                              <div>
-                                <span className="text-muted-foreground">Material: </span>
-                                <span>{product.material}</span>
-                              </div>
-                            )}
-                            <div>
-                              <span className="text-muted-foreground">Preço: </span>
-                              <span className="font-bold text-primary">
-                                R$ {product.sale_price.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                              </span>
-                            </div>
-                            <div>
-                              <span className="text-muted-foreground">Status: </span>
+                            </TableCell>
+                            <TableCell className="font-medium text-primary">
+                              R$ {product.sale_price.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                            </TableCell>
+                            <TableCell>
                               <span className={product.is_active ? 'text-green-600' : 'text-red-600'}>
                                 {product.is_active ? 'Ativo' : 'Inativo'}
                               </span>
-                            </div>
-                          </div>
-                        </div>
-                        
-                        <div className="flex gap-2">
-                          <Button variant="outline" size="sm">
-                            <Eye className="h-4 w-4" />
-                          </Button>
-                          <Button variant="outline" size="sm">
-                            <Edit className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                            </TableCell>
+                            <TableCell className="text-right">
+                              <div className="flex justify-end gap-2">
+                                <Button variant="outline" size="sm">
+                                  <Eye className="h-4 w-4" />
+                                </Button>
+                                <Button variant="outline" size="sm">
+                                  <Edit className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                  {totalPages > 1 && (
+                    <Pagination className="mt-4">
+                      <PaginationContent>
+                        <PaginationItem>
+                          <PaginationPrevious
+                            href="#"
+                            onClick={(e) => { e.preventDefault(); setPage((p) => Math.max(1, p - 1)); }}
+                            className={page <= 1 ? "pointer-events-none opacity-50" : ""}
+                          />
+                        </PaginationItem>
+                        {(() => {
+                          const start = Math.max(1, page - 2);
+                          const end = Math.min(totalPages, start + 4);
+                          return Array.from({ length: end - start + 1 }, (_, i) => start + i).map((p) => (
+                            <PaginationItem key={p}>
+                              <PaginationLink
+                                href="#"
+                                onClick={(e) => { e.preventDefault(); setPage(p); }}
+                                isActive={page === p}
+                              >
+                                {p}
+                              </PaginationLink>
+                            </PaginationItem>
+                          ));
+                        })()}
+                        <PaginationItem>
+                          <PaginationNext
+                            href="#"
+                            onClick={(e) => { e.preventDefault(); setPage((p) => Math.min(totalPages, p + 1)); }}
+                            className={page >= totalPages ? "pointer-events-none opacity-50" : ""}
+                          />
+                        </PaginationItem>
+                      </PaginationContent>
+                    </Pagination>
+                  )}
+                </>
               )}
             </CardContent>
           </Card>

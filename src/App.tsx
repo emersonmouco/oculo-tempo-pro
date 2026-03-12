@@ -13,6 +13,10 @@ import OSRelojoaria from "./pages/OSRelojoaria";
 import Prescricoes from "./pages/Prescricoes";
 import Montagem from "./pages/Montagem";
 import Estoque from "./pages/Estoque";
+import Compras from "./pages/Compras";
+import Financeiro from "./pages/Financeiro";
+import Agenda from "./pages/Agenda";
+import Configuracoes from "./pages/Configuracoes";
 import Relatorios from "./pages/Relatorios";
 import NotFound from "./pages/NotFound";
 
@@ -39,11 +43,11 @@ const App = () => (
             <Route path="/montagem" element={<Montagem />} />
             <Route path="/os-relojoaria" element={<OSRelojoaria />} />
             <Route path="/estoque" element={<Estoque />} />
-            <Route path="/compras" element={<Estoque />} />
-            <Route path="/financeiro" element={<Dashboard />} />
-            <Route path="/agenda" element={<Dashboard />} />
+            <Route path="/compras" element={<Compras />} />
+            <Route path="/financeiro" element={<Financeiro />} />
+            <Route path="/agenda" element={<Agenda />} />
             <Route path="/relatorios" element={<Relatorios />} />
-            <Route path="/configuracoes" element={<Dashboard />} />
+            <Route path="/configuracoes" element={<Configuracoes />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

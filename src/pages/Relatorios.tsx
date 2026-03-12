@@ -1,6 +1,10 @@
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
+import { supabase } from "@/integrations/supabase/client";
 import { 
   BarChart3, 
   Download, 
@@ -9,18 +13,83 @@ import {
   ShoppingCart,
   Package,
   DollarSign,
-  Calendar,
-  FileText,
   Target
 } from "lucide-react";
+import { format, subMonths } from "date-fns";
+import { ptBR } from "date-fns/locale";
+
+const chartConfig = {
+  valor: { label: "Receita (R$)", color: "hsl(var(--primary))" },
+  quantidade: { label: "Vendas", color: "hsl(var(--primary))" },
+};
+
+const COLORS = ["hsl(var(--primary))", "hsl(var(--accent))", "hsl(var(--muted-foreground))", "#22c55e", "#f59e0b"];
 
 const Relatorios = () => {
-  // Dados mockados para gráficos
-  const vendasMensais = [
-    { mes: "Jan", valor: 45000, quantidade: 185 },
-    { mes: "Fev", valor: 52000, quantidade: 210 },
-    { mes: "Mar", valor: 48000, quantidade: 198 },
-  ];
+  const [vendasMensais, setVendasMensais] = useState<{ mes: string; valor: number; quantidade: number }[]>([]);
+  const [paymentData, setPaymentData] = useState<{ name: string; value: number }[]>([]);
+  const [stats, setStats] = useState({ receita: 0, vendas: 0, ticketMedio: 0, novosClientes: 0 });
+
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const months: { mes: string; valor: number; quantidade: number }[] = [];
+        const PAYMENT_LABELS: Record<string, string> = {
+          pix: "PIX", dinheiro: "Dinheiro", cartao_debito: "Cartão Débito",
+          cartao_credito: "Cartão Crédito", parcelado: "Parcelado", boleto: "Boleto",
+        };
+
+        for (let i = 2; i >= 0; i--) {
+          const d = subMonths(new Date(), i);
+          const start = format(d, "yyyy-MM-01");
+          const end = format(new Date(d.getFullYear(), d.getMonth() + 1, 0), "yyyy-MM-dd");
+          const { data } = await supabase
+            .from("sales")
+            .select("total")
+            .eq("status", "finalizada")
+            .gte("created_at", `${start}T00:00:00`)
+            .lte("created_at", `${end}T23:59:59`);
+          const vendas = data || [];
+          const valor = vendas.reduce((a, s) => a + Number(s.total), 0);
+          months.push({
+            mes: format(d, "MMM", { locale: ptBR }),
+            valor,
+            quantidade: vendas.length,
+          });
+        }
+        setVendasMensais(months);
+
+        const startOfMonth = format(new Date(new Date().getFullYear(), new Date().getMonth(), 1), "yyyy-MM-dd");
+        const endOfMonth = format(new Date(), "yyyy-MM-dd");
+        const { data: salesMonth } = await supabase
+          .from("sales")
+          .select("total, payment_method")
+          .eq("status", "finalizada")
+          .gte("created_at", `${startOfMonth}T00:00:00`)
+          .lte("created_at", `${endOfMonth}T23:59:59`);
+
+        const sales = salesMonth || [];
+        const receita = sales.reduce((a, s) => a + Number(s.total), 0);
+        const paymentMap: Record<string, number> = {};
+        sales.forEach((s) => {
+          const m = s.payment_method || "outros";
+          paymentMap[m] = (paymentMap[m] || 0) + Number(s.total);
+        });
+        setPaymentData(
+          Object.entries(paymentMap).map(([k, v]) => ({ name: PAYMENT_LABELS[k] || k, value: v }))
+        );
+        setStats({
+          receita,
+          vendas: sales.length,
+          ticketMedio: sales.length > 0 ? receita / sales.length : 0,
+          novosClientes: 0,
+        });
+      } catch (e) {
+        console.error("Erro ao carregar relatórios:", e);
+      }
+    };
+    loadData();
+  }, []);
 
   const topProdutos = [
     { produto: "Ray-Ban RB5228", quantidade: 45, receita: "R$ 20.695,50" },
@@ -55,10 +124,8 @@ const Relatorios = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Receita Mês</p>
-                <p className="text-2xl font-bold text-primary">R$ 48.320,00</p>
-                <p className="text-xs text-success flex items-center gap-1">
-                  <TrendingUp className="h-3 w-3" />
-                  +12.5% vs mês anterior
+                <p className="text-2xl font-bold text-primary">
+                  R$ {stats.receita.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                 </p>
               </div>
               <DollarSign className="h-8 w-8 text-primary opacity-60" />
@@ -71,11 +138,7 @@ const Relatorios = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Vendas Realizadas</p>
-                <p className="text-2xl font-bold text-primary">198</p>
-                <p className="text-xs text-success flex items-center gap-1">
-                  <TrendingUp className="h-3 w-3" />
-                  +8.2% vs mês anterior
-                </p>
+                <p className="text-2xl font-bold text-primary">{stats.vendas}</p>
               </div>
               <ShoppingCart className="h-8 w-8 text-primary opacity-60" />
             </div>
@@ -87,10 +150,8 @@ const Relatorios = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Ticket Médio</p>
-                <p className="text-2xl font-bold text-primary">R$ 244,04</p>
-                <p className="text-xs text-success flex items-center gap-1">
-                  <TrendingUp className="h-3 w-3" />
-                  +3.8% vs mês anterior
+                <p className="text-2xl font-bold text-primary">
+                  R$ {stats.ticketMedio.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                 </p>
               </div>
               <Target className="h-8 w-8 text-primary opacity-60" />
@@ -103,11 +164,7 @@ const Relatorios = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Novos Clientes</p>
-                <p className="text-2xl font-bold text-primary">47</p>
-                <p className="text-xs text-success flex items-center gap-1">
-                  <TrendingUp className="h-3 w-3" />
-                  +15.6% vs mês anterior
-                </p>
+                <p className="text-2xl font-bold text-primary">{stats.novosClientes}</p>
               </div>
               <Users className="h-8 w-8 text-primary opacity-60" />
             </div>
@@ -127,7 +184,7 @@ const Relatorios = () => {
         {/* Relatório de Vendas */}
         <TabsContent value="vendas">
           <div className="grid gap-6 md:grid-cols-2">
-            {/* Vendas Mensais */}
+            {/* Vendas Mensais - Gráfico */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -136,26 +193,15 @@ const Relatorios = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  {vendasMensais.map((item, index) => (
-                    <div key={index} className="flex items-center justify-between p-3 bg-secondary rounded-lg">
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 bg-primary rounded flex items-center justify-center text-primary-foreground text-sm font-bold">
-                          {item.mes}
-                        </div>
-                        <div>
-                          <p className="font-medium">{item.quantidade} vendas</p>
-                          <p className="text-sm text-muted-foreground">
-                            Média: R$ {(item.valor / item.quantidade).toFixed(2)}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <p className="font-bold text-primary">R$ {item.valor.toLocaleString()}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                <ChartContainer config={chartConfig} className="h-[280px] w-full">
+                  <BarChart data={vendasMensais} margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
+                    <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                    <XAxis dataKey="mes" tickLine={false} axisLine={false} />
+                    <YAxis tickLine={false} axisLine={false} tickFormatter={(v) => `R$ ${(v / 1000).toFixed(0)}k`} />
+                    <ChartTooltip content={<ChartTooltipContent formatter={(v) => [`R$ ${Number(v).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`, "Receita"]} />} />
+                    <Bar dataKey="valor" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
+                  </BarChart>
+                </ChartContainer>
               </CardContent>
             </Card>
 
@@ -330,36 +376,29 @@ const Relatorios = () => {
                 <CardTitle>Formas de Pagamento</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center p-3 bg-secondary rounded">
-                    <span>Cartão de Crédito</span>
-                    <div className="text-right">
-                      <div className="font-bold">42%</div>
-                      <div className="text-sm text-muted-foreground">R$ 20.294,40</div>
-                    </div>
-                  </div>
-                  <div className="flex justify-between items-center p-3 bg-secondary rounded">
-                    <span>PIX</span>
-                    <div className="text-right">
-                      <div className="font-bold">28%</div>
-                      <div className="text-sm text-muted-foreground">R$ 13.529,60</div>
-                    </div>
-                  </div>
-                  <div className="flex justify-between items-center p-3 bg-secondary rounded">
-                    <span>Cartão de Débito</span>
-                    <div className="text-right">
-                      <div className="font-bold">20%</div>
-                      <div className="text-sm text-muted-foreground">R$ 9.664,00</div>
-                    </div>
-                  </div>
-                  <div className="flex justify-between items-center p-3 bg-secondary rounded">
-                    <span>Dinheiro</span>
-                    <div className="text-right">
-                      <div className="font-bold">10%</div>
-                      <div className="text-sm text-muted-foreground">R$ 4.832,00</div>
-                    </div>
-                  </div>
-                </div>
+                {paymentData.length === 0 ? (
+                  <p className="text-center py-8 text-muted-foreground">Nenhuma venda no mês.</p>
+                ) : (
+                  <ChartContainer config={{ value: { label: "Valor" } }} className="h-[240px] w-full">
+                    <PieChart>
+                      <ChartTooltip formatter={(v: number) => [`R$ ${v.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`, ""]} />
+                      <Pie
+                        data={paymentData}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={50}
+                        outerRadius={80}
+                        paddingAngle={2}
+                        dataKey="value"
+                        nameKey="name"
+                      >
+                        {paymentData.map((_, i) => (
+                          <Cell key={i} fill={COLORS[i % COLORS.length]} />
+                        ))}
+                      </Pie>
+                    </PieChart>
+                  </ChartContainer>
+                )}
               </CardContent>
             </Card>
           </div>

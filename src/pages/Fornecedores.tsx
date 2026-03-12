@@ -3,6 +3,22 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 import { supabase } from "@/integrations/supabase/client";
 import { ClientForm } from "@/components/forms/ClientForm";
 import { 
@@ -31,15 +47,22 @@ interface Fornecedor {
   };
 }
 
+const PAGE_SIZE = 10;
+
 const Fornecedores = () => {
   const [fornecedores, setFornecedores] = useState<Fornecedor[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [page, setPage] = useState(1);
 
   useEffect(() => {
     loadFornecedores();
   }, []);
+
+  useEffect(() => {
+    setPage(1);
+  }, [searchTerm]);
 
   const loadFornecedores = async () => {
     try {
@@ -77,6 +100,12 @@ const Fornecedores = () => {
     fornecedor.persons.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     fornecedor.persons.mobile_phone.includes(searchTerm) ||
     fornecedor.cnpj?.includes(searchTerm)
+  );
+
+  const totalPages = Math.ceil(filteredFornecedores.length / PAGE_SIZE);
+  const paginatedFornecedores = filteredFornecedores.slice(
+    (page - 1) * PAGE_SIZE,
+    page * PAGE_SIZE
   );
 
   const getStatusColor = (isActive: boolean) => {
@@ -160,76 +189,98 @@ const Fornecedores = () => {
               </p>
             </div>
           ) : (
-            <div className="space-y-4">
-              {filteredFornecedores.map((fornecedor) => (
-                <div key={fornecedor.id} className="border border-border rounded-lg p-4 hover:bg-secondary/50 transition-colors">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
-                        <h3 className="font-semibold text-lg">{fornecedor.persons.name}</h3>
-                        <Badge className={getStatusColor(fornecedor.is_active)}>
-                          {getStatusText(fornecedor.is_active)}
-                        </Badge>
-                      </div>
-                      
-                      <div className="mb-3">
-                        <p className="text-sm font-medium text-foreground">
-                          {fornecedor.company_name}
-                          {fornecedor.trade_name && fornecedor.trade_name !== fornecedor.company_name && (
-                            <span className="text-muted-foreground"> ({fornecedor.trade_name})</span>
-                          )}
-                        </p>
-                      </div>
-                      
-                      <div className="grid md:grid-cols-2 gap-4 text-sm">
-                        <div className="space-y-2">
+            <>
+              <div className="rounded-md border">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Nome / Contato</TableHead>
+                      <TableHead>Empresa</TableHead>
+                      <TableHead>Telefone</TableHead>
+                      <TableHead>CNPJ</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead className="text-right">Ações</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {paginatedFornecedores.map((fornecedor) => (
+                      <TableRow key={fornecedor.id}>
+                        <TableCell>
+                          <div className="font-medium">{fornecedor.persons.name}</div>
                           {fornecedor.persons.email && (
-                            <div className="flex items-center gap-2 text-muted-foreground">
-                              <Mail className="h-4 w-4" />
+                            <div className="text-xs text-muted-foreground flex items-center gap-1">
+                              <Mail className="h-3 w-3" />
                               {fornecedor.persons.email}
                             </div>
                           )}
-                          <div className="flex items-center gap-2 text-muted-foreground">
-                            <Phone className="h-4 w-4" />
-                            {fornecedor.persons.mobile_phone}
-                          </div>
-                          {fornecedor.persons.phone && (
-                            <div className="flex items-center gap-2 text-muted-foreground">
-                              <Phone className="h-4 w-4" />
-                              {fornecedor.persons.phone}
-                            </div>
+                        </TableCell>
+                        <TableCell>
+                          {fornecedor.company_name}
+                          {fornecedor.trade_name && fornecedor.trade_name !== fornecedor.company_name && (
+                            <span className="text-muted-foreground text-sm"> ({fornecedor.trade_name})</span>
                           )}
-                        </div>
-                        
-                        <div className="space-y-2">
-                          {fornecedor.cnpj && (
-                            <div>
-                              <span className="text-muted-foreground">CNPJ: </span>
-                              <span className="font-medium">{fornecedor.cnpj}</span>
-                            </div>
-                          )}
-                          <div>
-                            <span className="text-muted-foreground">Nascimento: </span>
-                            <span className="font-medium">
-                              {new Date(fornecedor.persons.birth_date).toLocaleDateString('pt-BR')}
-                            </span>
+                        </TableCell>
+                        <TableCell className="flex items-center gap-1">
+                          <Phone className="h-3 w-3 text-muted-foreground" />
+                          {fornecedor.persons.mobile_phone}
+                        </TableCell>
+                        <TableCell>{fornecedor.cnpj || "-"}</TableCell>
+                        <TableCell>
+                          <Badge className={getStatusColor(fornecedor.is_active)}>
+                            {getStatusText(fornecedor.is_active)}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex justify-end gap-2">
+                            <Button variant="outline" size="sm">
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                            <Button variant="outline" size="sm">
+                              <Edit className="h-4 w-4" />
+                            </Button>
                           </div>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="flex gap-2">
-                      <Button variant="outline" size="sm">
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                      <Button variant="outline" size="sm">
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+              {totalPages > 1 && (
+                <Pagination className="mt-4">
+                  <PaginationContent>
+                    <PaginationItem>
+                      <PaginationPrevious
+                        href="#"
+                        onClick={(e) => { e.preventDefault(); setPage((p) => Math.max(1, p - 1)); }}
+                        className={page <= 1 ? "pointer-events-none opacity-50" : ""}
+                      />
+                    </PaginationItem>
+                    {(() => {
+                      const start = Math.max(1, page - 2);
+                      const end = Math.min(totalPages, start + 4);
+                      return Array.from({ length: end - start + 1 }, (_, i) => start + i).map((p) => (
+                        <PaginationItem key={p}>
+                          <PaginationLink
+                            href="#"
+                            onClick={(e) => { e.preventDefault(); setPage(p); }}
+                            isActive={page === p}
+                          >
+                            {p}
+                          </PaginationLink>
+                        </PaginationItem>
+                      ));
+                    })()}
+                    <PaginationItem>
+                      <PaginationNext
+                        href="#"
+                        onClick={(e) => { e.preventDefault(); setPage((p) => Math.min(totalPages, p + 1)); }}
+                        className={page >= totalPages ? "pointer-events-none opacity-50" : ""}
+                      />
+                    </PaginationItem>
+                  </PaginationContent>
+                </Pagination>
+              )}
+            </>
           )}
         </CardContent>
       </Card>

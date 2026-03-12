@@ -4,6 +4,22 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 import { supabase } from "@/integrations/supabase/client";
 import { 
   ShoppingCart, 
@@ -46,10 +62,13 @@ const PAYMENT_LABELS: Record<string, string> = {
   boleto: "Boleto",
 };
 
+const PAGE_SIZE = 10;
+
 const Vendas = () => {
   const [sales, setSales] = useState<Sale[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  const [page, setPage] = useState(1);
   const [stats, setStats] = useState({
     vendasHoje: 0,
     transacoesHoje: 0,
@@ -118,6 +137,16 @@ const Vendas = () => {
       (s.sale_number || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
       (s.persons?.name || "").toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const totalPages = Math.ceil(filteredSales.length / PAGE_SIZE);
+  const paginatedSales = filteredSales.slice(
+    (page - 1) * PAGE_SIZE,
+    page * PAGE_SIZE
+  );
+
+  useEffect(() => {
+    setPage(1);
+  }, [searchTerm]);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -242,67 +271,100 @@ const Vendas = () => {
               </Button>
             </div>
           ) : (
-            <div className="space-y-4">
-              {filteredSales.map((venda) => (
-                <div
-                  key={venda.id}
-                  className="border border-border rounded-lg p-4 hover:bg-secondary/50"
-                >
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
-                        <h3 className="font-semibold text-lg">
-                          {venda.sale_number || venda.id.slice(0, 8)} -{" "}
-                          {venda.persons?.name || "Cliente não informado"}
-                        </h3>
-                        <Badge className={getStatusColor(venda.status)}>
-                          {getStatusLabel(venda.status)}
-                        </Badge>
-                      </div>
-
-                      <div className="grid md:grid-cols-3 gap-4 text-sm">
-                        <div>
-                          <span className="text-muted-foreground">Data: </span>
-                          <span>{format(new Date(venda.created_at), "dd/MM/yyyy HH:mm")}</span>
-                        </div>
-                        <div>
-                          <span className="text-muted-foreground">Produtos: </span>
-                          <span className="truncate block max-w-[200px]">
-                            {getProductNames(venda.sale_items || [])}
-                          </span>
-                        </div>
-                        <div>
-                          <span className="text-muted-foreground">Vendedor: </span>
-                          <span>{venda.seller_name || "-"}</span>
-                        </div>
-                        <div>
-                          <span className="text-muted-foreground">Valor: </span>
-                          <span className="font-bold text-primary">
-                            R$ {Number(venda.total).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
-                          </span>
-                        </div>
-                        <div>
-                          <span className="text-muted-foreground">Pagamento: </span>
-                          <span>
-                            {PAYMENT_LABELS[venda.payment_method || ""] || venda.payment_method || "-"}
-                            {venda.payment_details ? ` (${venda.payment_details})` : ""}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="flex gap-2">
-                      <Button variant="outline" size="sm">
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                      <Button variant="outline" size="sm">
-                        <Printer className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+            <>
+              <div className="rounded-md border">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Venda / Cliente</TableHead>
+                      <TableHead>Data</TableHead>
+                      <TableHead>Produtos</TableHead>
+                      <TableHead>Valor</TableHead>
+                      <TableHead>Pagamento</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead className="text-right">Ações</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {paginatedSales.map((venda) => (
+                      <TableRow key={venda.id}>
+                        <TableCell>
+                          <div className="font-medium">
+                            {venda.sale_number || venda.id.slice(0, 8)}
+                          </div>
+                          <div className="text-xs text-muted-foreground">
+                            {venda.persons?.name || "Cliente não informado"}
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-sm">
+                          {format(new Date(venda.created_at), "dd/MM/yyyy HH:mm")}
+                        </TableCell>
+                        <TableCell className="max-w-[180px] truncate text-sm">
+                          {getProductNames(venda.sale_items || [])}
+                        </TableCell>
+                        <TableCell className="font-bold text-primary">
+                          R$ {Number(venda.total).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                        </TableCell>
+                        <TableCell className="text-sm">
+                          {PAYMENT_LABELS[venda.payment_method || ""] || venda.payment_method || "-"}
+                          {venda.payment_details ? ` (${venda.payment_details})` : ""}
+                        </TableCell>
+                        <TableCell>
+                          <Badge className={getStatusColor(venda.status)}>
+                            {getStatusLabel(venda.status)}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex justify-end gap-2">
+                            <Button variant="outline" size="sm">
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                            <Button variant="outline" size="sm">
+                              <Printer className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+              {totalPages > 1 && (
+                <Pagination className="mt-4">
+                  <PaginationContent>
+                    <PaginationItem>
+                      <PaginationPrevious
+                        href="#"
+                        onClick={(e) => { e.preventDefault(); setPage((p) => Math.max(1, p - 1)); }}
+                        className={page <= 1 ? "pointer-events-none opacity-50" : ""}
+                      />
+                    </PaginationItem>
+                    {(() => {
+                      const start = Math.max(1, page - 2);
+                      const end = Math.min(totalPages, start + 4);
+                      return Array.from({ length: end - start + 1 }, (_, i) => start + i).map((p) => (
+                        <PaginationItem key={p}>
+                          <PaginationLink
+                            href="#"
+                            onClick={(e) => { e.preventDefault(); setPage(p); }}
+                            isActive={page === p}
+                          >
+                            {p}
+                          </PaginationLink>
+                        </PaginationItem>
+                      ));
+                    })()}
+                    <PaginationItem>
+                      <PaginationNext
+                        href="#"
+                        onClick={(e) => { e.preventDefault(); setPage((p) => Math.min(totalPages, p + 1)); }}
+                        className={page >= totalPages ? "pointer-events-none opacity-50" : ""}
+                      />
+                    </PaginationItem>
+                  </PaginationContent>
+                </Pagination>
+              )}
+            </>
           )}
         </CardContent>
       </Card>

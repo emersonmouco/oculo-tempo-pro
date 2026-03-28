@@ -14,6 +14,128 @@ export type Database = {
   }
   public: {
     Tables: {
+      legal_persons: {
+        Row: {
+          cnpj: string | null
+          company_name: string | null
+          contact_email: string | null
+          contact_person: string | null
+          created_at: string
+          delivery_time: string | null
+          id: string
+          is_active: boolean
+          municipal_registration: string | null
+          observations: string | null
+          payment_terms: string | null
+          person_id: string | null
+          state_registration: string | null
+          supplier_since: string | null
+          trade_name: string | null
+          updated_at: string
+        }
+        Insert: {
+          cnpj?: string | null
+          company_name?: string | null
+          contact_email?: string | null
+          contact_person?: string | null
+          created_at?: string
+          delivery_time?: string | null
+          id?: string
+          is_active?: boolean
+          municipal_registration?: string | null
+          observations?: string | null
+          payment_terms?: string | null
+          person_id?: string | null
+          state_registration?: string | null
+          supplier_since?: string | null
+          trade_name?: string | null
+          updated_at?: string
+        }
+        Update: {
+          cnpj?: string | null
+          company_name?: string | null
+          contact_email?: string | null
+          contact_person?: string | null
+          created_at?: string
+          delivery_time?: string | null
+          id?: string
+          is_active?: boolean
+          municipal_registration?: string | null
+          observations?: string | null
+          payment_terms?: string | null
+          person_id?: string | null
+          state_registration?: string | null
+          supplier_since?: string | null
+          trade_name?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "legal_persons_person_id_fkey"
+            columns: ["person_id"]
+            isOneToOne: false
+            referencedRelation: "persons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      persons: {
+        Row: {
+          address: string | null
+          birth_date: string | null
+          city: string | null
+          cpf: string | null
+          created_at: string
+          email: string | null
+          id: string
+          is_active: boolean
+          mobile_phone: string | null
+          name: string
+          notes: string | null
+          phone: string | null
+          rg: string | null
+          state: string | null
+          updated_at: string
+          zip_code: string | null
+        }
+        Insert: {
+          address?: string | null
+          birth_date?: string | null
+          city?: string | null
+          cpf?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          is_active?: boolean
+          mobile_phone?: string | null
+          name: string
+          notes?: string | null
+          phone?: string | null
+          rg?: string | null
+          state?: string | null
+          updated_at?: string
+          zip_code?: string | null
+        }
+        Update: {
+          address?: string | null
+          birth_date?: string | null
+          city?: string | null
+          cpf?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          is_active?: boolean
+          mobile_phone?: string | null
+          name?: string
+          notes?: string | null
+          phone?: string | null
+          rg?: string | null
+          state?: string | null
+          updated_at?: string
+          zip_code?: string | null
+        }
+        Relationships: []
+      }
       products: {
         Row: {
           barcode: string | null
@@ -79,6 +201,98 @@ export type Database = {
           warranty_period_months?: number | null
         }
         Relationships: []
+      }
+      sale_items: {
+        Row: {
+          created_at: string
+          id: string
+          product_id: string
+          quantity: number
+          sale_id: string
+          subtotal: number
+          unit_price: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          product_id: string
+          quantity?: number
+          sale_id: string
+          subtotal: number
+          unit_price: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          product_id?: string
+          quantity?: number
+          sale_id?: string
+          subtotal?: number
+          unit_price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sale_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sale_items_sale_id_fkey"
+            columns: ["sale_id"]
+            isOneToOne: false
+            referencedRelation: "sales"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sales: {
+        Row: {
+          created_at: string
+          discount: number | null
+          id: string
+          notes: string | null
+          payment_method: string | null
+          person_id: string | null
+          sale_date: string
+          seller_name: string | null
+          status: string
+          total: number
+        }
+        Insert: {
+          created_at?: string
+          discount?: number | null
+          id?: string
+          notes?: string | null
+          payment_method?: string | null
+          person_id?: string | null
+          sale_date?: string
+          seller_name?: string | null
+          status?: string
+          total?: number
+        }
+        Update: {
+          created_at?: string
+          discount?: number | null
+          id?: string
+          notes?: string | null
+          payment_method?: string | null
+          person_id?: string | null
+          sale_date?: string
+          seller_name?: string | null
+          status?: string
+          total?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sales_person_id_fkey"
+            columns: ["person_id"]
+            isOneToOne: false
+            referencedRelation: "persons"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {

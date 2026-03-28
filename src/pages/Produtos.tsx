@@ -143,13 +143,31 @@ const Produtos = () => {
           <h1 className="text-3xl font-bold text-foreground">Catálogo de Produtos</h1>
           <p className="text-muted-foreground">Gerencie armações, lentes e relógios</p>
         </div>
-        <Button 
-          className="erp-button-primary flex items-center gap-2"
-          onClick={() => setShowForm(true)}
-        >
-          <Plus className="h-4 w-4" />
-          Novo Produto
-        </Button>
+        <div className="flex gap-2">
+          <Button 
+            variant="outline"
+            onClick={async () => {
+              try {
+                const { seedProducts } = await import("@/utils/seedProducts");
+                const result = await seedProducts();
+                alert(`Inseridos: ${result.inserted} | Já existiam: ${result.skipped}`);
+                loadProducts();
+              } catch (e: any) {
+                alert("Erro ao inserir produtos teste: " + e.message);
+              }
+            }}
+          >
+            <Package className="h-4 w-4 mr-2" />
+            Inserir Dados Teste
+          </Button>
+          <Button 
+            className="erp-button-primary flex items-center gap-2"
+            onClick={() => setShowForm(true)}
+          >
+            <Plus className="h-4 w-4" />
+            Novo Produto
+          </Button>
+        </div>
       </div>
 
       {/* Filtros e Busca */}

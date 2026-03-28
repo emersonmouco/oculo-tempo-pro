@@ -14,7 +14,72 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      products: {
+        Row: {
+          barcode: string | null
+          brand: string | null
+          category: string | null
+          color: string | null
+          cost_price: number | null
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          material: string | null
+          min_stock_level: number | null
+          model: string | null
+          name: string
+          sale_price: number
+          size: string | null
+          sku: string | null
+          stock_quantity: number
+          updated_at: string
+          warranty_period_months: number | null
+        }
+        Insert: {
+          barcode?: string | null
+          brand?: string | null
+          category?: string | null
+          color?: string | null
+          cost_price?: number | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          material?: string | null
+          min_stock_level?: number | null
+          model?: string | null
+          name: string
+          sale_price?: number
+          size?: string | null
+          sku?: string | null
+          stock_quantity?: number
+          updated_at?: string
+          warranty_period_months?: number | null
+        }
+        Update: {
+          barcode?: string | null
+          brand?: string | null
+          category?: string | null
+          color?: string | null
+          cost_price?: number | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          material?: string | null
+          min_stock_level?: number | null
+          model?: string | null
+          name?: string
+          sale_price?: number
+          size?: string | null
+          sku?: string | null
+          stock_quantity?: number
+          updated_at?: string
+          warranty_period_months?: number | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

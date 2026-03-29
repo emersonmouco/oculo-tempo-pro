@@ -130,7 +130,7 @@ const PDV = () => {
   const [isSeeding, setIsSeeding] = useState(false);
 
   const loadProducts = useCallback(async () => {
-    const { data, error } = await supabase
+    const { data, error } = await db
       .from("products")
       .select("id, name, sku, barcode, category, brand, model, sale_price, stock_quantity, min_stock_level, is_active")
       .eq("is_active", true)

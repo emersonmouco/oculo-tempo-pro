@@ -32,7 +32,7 @@ export async function seedProducts(): Promise<{ inserted: number; skipped: numbe
 
   if (toInsert.length === 0) return { inserted: 0, skipped: SEED_PRODUCTS.length };
 
-  const { error } = await supabase.from("products").insert(toInsert);
+  const { error } = await db.from("products").insert(toInsert);
   if (error) throw error;
 
   return { inserted: toInsert.length, skipped: SEED_PRODUCTS.length - toInsert.length };

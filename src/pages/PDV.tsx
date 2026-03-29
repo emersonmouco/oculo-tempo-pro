@@ -296,7 +296,7 @@ const PDV = () => {
         subtotal: item.subtotal,
       }));
 
-      const { error: itemsError } = await supabase.from("sale_items").insert(items);
+      const { error: itemsError } = await db.from("sale_items").insert(items);
       if (itemsError) throw itemsError;
 
       // Movimentação de estoque

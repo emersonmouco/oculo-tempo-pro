@@ -38,7 +38,7 @@ const Dashboard = () => {
         const valorHoje = vendas.reduce((acc, s) => acc + Number(s.total), 0);
         const ticketMedio = vendas.length > 0 ? valorHoje / vendas.length : 0;
 
-        const { count: countFornecedores } = await supabase
+        const { count: countFornecedores } = await db
           .from("legal_persons")
           .select("id", { count: "exact", head: true })
           .eq("is_active", true);

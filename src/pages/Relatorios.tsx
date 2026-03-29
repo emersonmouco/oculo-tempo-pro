@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
-import { supabase } from "@/integrations/supabase/client";
+import { db } from "@/integrations/supabase/db";
 import { 
   BarChart3, 
   Download, 
@@ -43,7 +43,7 @@ const Relatorios = () => {
           const d = subMonths(new Date(), i);
           const start = format(d, "yyyy-MM-01");
           const end = format(new Date(d.getFullYear(), d.getMonth() + 1, 0), "yyyy-MM-dd");
-          const { data } = await supabase
+          const { data } = await db
             .from("sales")
             .select("total")
             .eq("status", "finalizada")
@@ -61,7 +61,7 @@ const Relatorios = () => {
 
         const startOfMonth = format(new Date(new Date().getFullYear(), new Date().getMonth(), 1), "yyyy-MM-dd");
         const endOfMonth = format(new Date(), "yyyy-MM-dd");
-        const { data: salesMonth } = await supabase
+        const { data: salesMonth } = await db
           .from("sales")
           .select("total, payment_method")
           .eq("status", "finalizada")

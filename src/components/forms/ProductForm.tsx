@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Package, Save } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { db } from "@/integrations/supabase/db";
 import { useToast } from "@/hooks/use-toast";
 
 import { Button } from "@/components/ui/button";
@@ -79,7 +79,7 @@ export function ProductForm({ onSuccess }: { onSuccess?: () => void }) {
 
   const loadSuppliers = async () => {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await db
         .from("legal_persons")
         .select("id, company_name, trade_name")
         .eq("is_active", true)
@@ -95,7 +95,7 @@ export function ProductForm({ onSuccess }: { onSuccess?: () => void }) {
   const onSubmit = async (data: ProductFormData) => {
     setIsLoading(true);
     try {
-      const { error } = await supabase
+      const { error } = await db
         .from("products")
         .insert({
           name: data.name,

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
+import { db } from "@/integrations/supabase/db";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -28,7 +28,7 @@ const Dashboard = () => {
     const loadStats = async () => {
       try {
         const today = new Date().toISOString().split("T")[0];
-        const { data: salesToday } = await supabase
+        const { data: salesToday } = await db
           .from("sales")
           .select("id, total")
           .eq("status", "finalizada")
@@ -38,12 +38,12 @@ const Dashboard = () => {
         const valorHoje = vendas.reduce((acc, s) => acc + Number(s.total), 0);
         const ticketMedio = vendas.length > 0 ? valorHoje / vendas.length : 0;
 
-        const { count: countFornecedores } = await supabase
+        const { count: countFornecedores } = await db
           .from("legal_persons")
           .select("id", { count: "exact", head: true })
           .eq("is_active", true);
 
-        const { data: products } = await supabase
+        const { data: products } = await db
           .from("products")
           .select("stock_quantity");
 

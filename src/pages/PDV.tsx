@@ -33,7 +33,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { supabase } from "@/integrations/supabase/client";
+import { db } from "@/integrations/supabase/db";
 import { seedProducts } from "@/utils/seedProducts";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -130,7 +130,7 @@ const PDV = () => {
   const [isSeeding, setIsSeeding] = useState(false);
 
   const loadProducts = useCallback(async () => {
-    const { data, error } = await supabase
+    const { data, error } = await db
       .from("products")
       .select("id, name, sku, barcode, category, brand, model, sale_price, stock_quantity, min_stock_level, is_active")
       .eq("is_active", true)
@@ -144,7 +144,7 @@ const PDV = () => {
   }, []);
 
   const loadPersons = useCallback(async () => {
-    const { data, error } = await supabase
+    const { data, error } = await db
       .from("persons")
       .select("id, name, mobile_phone, email")
       .order("name");
@@ -273,7 +273,7 @@ const PDV = () => {
     }
     setIsFinalizing(true);
     try {
-      const { data: saleData, error: saleError } = await supabase
+      const { data: saleData, error: saleError } = await db
         .from("sales")
         .insert({
           person_id: selectedCustomer?.id || null,
@@ -296,12 +296,12 @@ const PDV = () => {
         subtotal: item.subtotal,
       }));
 
-      const { error: itemsError } = await supabase.from("sale_items").insert(items);
+      const { error: itemsError } = await db.from("sale_items").insert(items);
       if (itemsError) throw itemsError;
 
       // Movimentação de estoque
       for (const item of cart) {
-        await supabase
+        await db
           .from("products")
           .update({ stock_quantity: item.product.stock_quantity - item.quantity })
           .eq("id", item.product.id);

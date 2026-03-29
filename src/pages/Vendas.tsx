@@ -20,7 +20,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import { supabase } from "@/integrations/supabase/client";
+import { db } from "@/integrations/supabase/db";
 import { 
   ShoppingCart, 
   Search,
@@ -83,7 +83,7 @@ const Vendas = () => {
     setIsLoading(true);
     try {
       const today = format(new Date(), "yyyy-MM-dd");
-      const { data: todayData } = await supabase
+      const { data: todayData } = await db
         .from("sales")
         .select("id, total")
         .eq("status", "finalizada")
@@ -97,7 +97,7 @@ const Vendas = () => {
 
       setStats({ vendasHoje, transacoesHoje, ticketMedio });
 
-      const { data, error } = await supabase
+      const { data, error } = await db
         .from("sales")
         .select(`
           id,

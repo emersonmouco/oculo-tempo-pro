@@ -16,58 +16,82 @@ export type Database = {
     Tables: {
       legal_persons: {
         Row: {
+          business_activity_code: string | null
           cnpj: string | null
           company_name: string | null
           contact_email: string | null
           contact_person: string | null
           created_at: string
           delivery_time: string | null
+          fax_number: string | null
           id: string
           is_active: boolean
+          is_tax_exempt: boolean | null
+          legal_representative_name: string | null
+          legal_representative_phone: string | null
           municipal_registration: string | null
           observations: string | null
           payment_terms: string | null
           person_id: string | null
           state_registration: string | null
+          supplier_code: string | null
           supplier_since: string | null
+          tax_regime: string | null
           trade_name: string | null
           updated_at: string
+          website_url: string | null
         }
         Insert: {
+          business_activity_code?: string | null
           cnpj?: string | null
           company_name?: string | null
           contact_email?: string | null
           contact_person?: string | null
           created_at?: string
           delivery_time?: string | null
+          fax_number?: string | null
           id?: string
           is_active?: boolean
+          is_tax_exempt?: boolean | null
+          legal_representative_name?: string | null
+          legal_representative_phone?: string | null
           municipal_registration?: string | null
           observations?: string | null
           payment_terms?: string | null
           person_id?: string | null
           state_registration?: string | null
+          supplier_code?: string | null
           supplier_since?: string | null
+          tax_regime?: string | null
           trade_name?: string | null
           updated_at?: string
+          website_url?: string | null
         }
         Update: {
+          business_activity_code?: string | null
           cnpj?: string | null
           company_name?: string | null
           contact_email?: string | null
           contact_person?: string | null
           created_at?: string
           delivery_time?: string | null
+          fax_number?: string | null
           id?: string
           is_active?: boolean
+          is_tax_exempt?: boolean | null
+          legal_representative_name?: string | null
+          legal_representative_phone?: string | null
           municipal_registration?: string | null
           observations?: string | null
           payment_terms?: string | null
           person_id?: string | null
           state_registration?: string | null
+          supplier_code?: string | null
           supplier_since?: string | null
+          tax_regime?: string | null
           trade_name?: string | null
           updated_at?: string
+          website_url?: string | null
         }
         Relationships: [
           {
@@ -253,9 +277,11 @@ export type Database = {
           discount: number | null
           id: string
           notes: string | null
+          payment_details: string | null
           payment_method: string | null
           person_id: string | null
           sale_date: string
+          sale_number: string | null
           seller_name: string | null
           status: string
           total: number
@@ -265,9 +291,11 @@ export type Database = {
           discount?: number | null
           id?: string
           notes?: string | null
+          payment_details?: string | null
           payment_method?: string | null
           person_id?: string | null
           sale_date?: string
+          sale_number?: string | null
           seller_name?: string | null
           status?: string
           total?: number
@@ -277,9 +305,11 @@ export type Database = {
           discount?: number | null
           id?: string
           notes?: string | null
+          payment_details?: string | null
           payment_method?: string | null
           person_id?: string | null
           sale_date?: string
+          sale_number?: string | null
           seller_name?: string | null
           status?: string
           total?: number

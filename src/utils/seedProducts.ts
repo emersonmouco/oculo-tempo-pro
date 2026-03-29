@@ -1,4 +1,4 @@
-import { supabase } from "@/integrations/supabase/client";
+import { db } from "@/integrations/supabase/db";
 
 const SEED_PRODUCTS = [
   { name: 'Armação Ray-Ban Aviator', sku: 'ARM-RB-001', barcode: '7891234567890', category: 'Armação', brand: 'Ray-Ban', model: 'Aviator RB3025', sale_price: 899.90, cost_price: 450.00, stock_quantity: 15, color: 'Dourado', material: 'Metal', warranty_period_months: 12, min_stock_level: 3 },
@@ -22,7 +22,7 @@ const SEED_PRODUCTS = [
 ];
 
 export async function seedProducts(): Promise<{ inserted: number; skipped: number }> {
-  const { data: existing } = await supabase
+  const { data: existing } = await db
     .from("products")
     .select("sku")
     .in("sku", SEED_PRODUCTS.map(p => p.sku));
@@ -32,7 +32,7 @@ export async function seedProducts(): Promise<{ inserted: number; skipped: numbe
 
   if (toInsert.length === 0) return { inserted: 0, skipped: SEED_PRODUCTS.length };
 
-  const { error } = await supabase.from("products").insert(toInsert);
+  const { error } = await db.from("products").insert(toInsert);
   if (error) throw error;
 
   return { inserted: toInsert.length, skipped: SEED_PRODUCTS.length - toInsert.length };

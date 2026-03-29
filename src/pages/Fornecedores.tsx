@@ -19,7 +19,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import { supabase } from "@/integrations/supabase/client";
+import { db } from "@/integrations/supabase/db";
 import { ClientForm } from "@/components/forms/ClientForm";
 import { 
   Search, 
@@ -66,7 +66,7 @@ const Fornecedores = () => {
 
   const loadFornecedores = async () => {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await db
         .from("legal_persons")
         .select(`
           id,

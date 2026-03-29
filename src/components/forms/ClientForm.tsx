@@ -5,7 +5,7 @@ import { z } from "zod";
 import { format } from "date-fns";
 import { CalendarIcon, Save, User, Building2 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { supabase } from "@/integrations/supabase/client";
+import { db } from "@/integrations/supabase/db";
 import { useToast } from "@/hooks/use-toast";
 
 import { Button } from "@/components/ui/button";
@@ -78,7 +78,7 @@ export function ClientForm() {
     setIsLoading(true);
     try {
       // First, insert the person
-      const { data: personData, error: personError } = await supabase
+      const { data: personData, error: personError } = await db
         .from("persons")
         .insert({
           name: data.name,
@@ -93,7 +93,7 @@ export function ClientForm() {
       if (personError) throw personError;
 
       // Then, insert the legal person
-      const { error: legalPersonError } = await supabase
+      const { error: legalPersonError } = await db
         .from("legal_persons")
         .insert({
           person_id: personData.id,

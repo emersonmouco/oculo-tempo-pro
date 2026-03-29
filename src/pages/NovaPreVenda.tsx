@@ -38,7 +38,6 @@ import {
   Percent,
   DollarSign,
   AlertTriangle,
-  Package,
   UserCheck,
   Save,
 } from "lucide-react";
@@ -71,16 +70,6 @@ interface Person {
   email?: string | null;
 }
 
-const CATEGORY_COLORS: Record<string, string> = {
-  Armação: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
-  Lente: "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200",
-  "Óculos de Sol": "bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200",
-  Relógio: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200",
-  Acessório: "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200",
-  "Acessório Relógio": "bg-teal-100 text-teal-800 dark:bg-teal-900 dark:text-teal-200",
-  "Armação Infantil": "bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-200",
-};
-
 const NovaPreVenda = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -98,7 +87,6 @@ const NovaPreVenda = () => {
   const [discountType, setDiscountType] = useState<"value" | "percent">("value");
   const [discountInput, setDiscountInput] = useState("");
   const [showSaveDialog, setShowSaveDialog] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [isSaving, setIsSaving] = useState(false);
 
   const loadProducts = useCallback(async () => {
@@ -127,18 +115,16 @@ const NovaPreVenda = () => {
     loadPersons();
   }, [loadProducts, loadPersons]);
 
-  const categories = [...new Set(products.map((p) => p.category).filter(Boolean))] as string[];
-
   const filteredProducts = products.filter((p) => {
-    const matchSearch =
-      !searchQuery ||
-      p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      p.sku?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      p.barcode?.includes(searchQuery) ||
-      p.brand?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      p.model?.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchCategory = selectedCategory === "all" || p.category === selectedCategory;
-    return matchSearch && matchCategory;
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) return false;
+    return (
+      p.name.toLowerCase().includes(q) ||
+      p.sku?.toLowerCase().includes(q) ||
+      p.barcode?.includes(searchQuery.trim()) ||
+      p.brand?.toLowerCase().includes(q) ||
+      p.model?.toLowerCase().includes(q)
+    );
   });
 
   const filteredPersons = persons.filter(
@@ -289,7 +275,7 @@ const NovaPreVenda = () => {
       </div>
 
       <div className="flex-1 grid gap-3 lg:grid-cols-[1fr_380px] min-h-0 overflow-hidden">
-        <div className="flex flex-col gap-3 min-h-0 overflow-hidden">
+        <div className="flex flex-col gap-2 min-h-0 overflow-hidden">
           <Card className="flex-shrink-0">
             <CardContent className="p-3">
               <div className="relative">
@@ -318,12 +304,12 @@ const NovaPreVenda = () => {
                   />
                   <Barcode className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 </div>
-                {searchOpen && searchQuery.length > 0 && (
-                  <div className="absolute z-50 top-full left-0 right-0 mt-1 bg-popover border rounded-md shadow-lg max-h-[300px] overflow-y-auto">
+                {searchOpen && searchQuery.trim().length > 0 && (
+                  <div className="absolute z-50 top-full left-0 right-0 mt-1 bg-popover border rounded-md shadow-lg max-h-[min(50vh,320px)] overflow-y-auto">
                     {filteredProducts.length === 0 ? (
                       <div className="py-6 text-center text-sm text-muted-foreground">Nenhum produto encontrado.</div>
                     ) : (
-                      filteredProducts.slice(0, 10).map((product) => (
+                      filteredProducts.slice(0, 20).map((product) => (
                         <div
                           key={product.id}
                           onMouseDown={() => addToCart(product)}
@@ -347,67 +333,7 @@ const NovaPreVenda = () => {
                   </div>
                 )}
               </div>
-            </CardContent>
-          </Card>
-
-          <div className="flex gap-2 flex-wrap flex-shrink-0">
-            <Button variant={selectedCategory === "all" ? "default" : "outline"} size="sm" onClick={() => setSelectedCategory("all")}>
-              Todos
-            </Button>
-            {categories.map((cat) => (
-              <Button
-                key={cat}
-                variant={selectedCategory === cat ? "default" : "outline"}
-                size="sm"
-                onClick={() => setSelectedCategory(cat)}
-              >
-                {cat}
-              </Button>
-            ))}
-          </div>
-
-          <Card className="flex-1 min-h-0 overflow-hidden">
-            <CardContent className="p-3 h-full overflow-y-auto">
-              {filteredProducts.length === 0 ? (
-                <div className="flex flex-col items-center justify-center h-full text-muted-foreground gap-3">
-                  <Package className="h-12 w-12" />
-                  <p>Nenhum produto encontrado.</p>
-                </div>
-              ) : (
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
-                  {filteredProducts.map((product) => (
-                    <button
-                      key={product.id}
-                      type="button"
-                      className="relative flex flex-col items-start p-3 text-left rounded-lg border border-border bg-card hover:bg-accent/50 hover:border-primary/30 transition-all group"
-                      onClick={() => addToCart(product)}
-                    >
-                      {isLowStock(product) && (
-                        <div className="absolute top-1.5 right-1.5">
-                          <AlertTriangle className="h-3.5 w-3.5 text-amber-500" />
-                        </div>
-                      )}
-                      <Badge
-                        variant="secondary"
-                        className={`text-[10px] px-1.5 py-0 mb-1 ${CATEGORY_COLORS[product.category || ""] || "bg-secondary text-secondary-foreground"}`}
-                      >
-                        {product.category || "Geral"}
-                      </Badge>
-                      <span className="font-medium text-sm truncate w-full text-foreground">
-                        {product.brand && product.model ? `${product.brand} ${product.model}` : product.name}
-                      </span>
-                      <div className="flex items-center justify-between w-full mt-1">
-                        <span className="text-primary font-bold text-sm">R$ {product.sale_price.toFixed(2)}</span>
-                        <span
-                          className={`text-[11px] ${isLowStock(product) ? "text-amber-600 font-medium" : "text-muted-foreground"}`}
-                        >
-                          Est: {product.stock_quantity}
-                        </span>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              )}
+              <p className="text-xs text-muted-foreground mt-2">Digite para buscar e toque em um resultado para adicionar ao carrinho.</p>
             </CardContent>
           </Card>
         </div>

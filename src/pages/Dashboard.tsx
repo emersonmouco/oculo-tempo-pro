@@ -28,7 +28,7 @@ const Dashboard = () => {
     const loadStats = async () => {
       try {
         const today = new Date().toISOString().split("T")[0];
-        const { data: salesToday } = await supabase
+        const { data: salesToday } = await db
           .from("sales")
           .select("id, total")
           .eq("status", "finalizada")

@@ -22,7 +22,7 @@ const SEED_PRODUCTS = [
 ];
 
 export async function seedProducts(): Promise<{ inserted: number; skipped: number }> {
-  const { data: existing } = await supabase
+  const { data: existing } = await db
     .from("products")
     .select("sku")
     .in("sku", SEED_PRODUCTS.map(p => p.sku));

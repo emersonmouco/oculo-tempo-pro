@@ -144,7 +144,7 @@ const PDV = () => {
   }, []);
 
   const loadPersons = useCallback(async () => {
-    const { data, error } = await supabase
+    const { data, error } = await db
       .from("persons")
       .select("id, name, mobile_phone, email")
       .order("name");

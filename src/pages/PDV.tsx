@@ -273,7 +273,7 @@ const PDV = () => {
     }
     setIsFinalizing(true);
     try {
-      const { data: saleData, error: saleError } = await supabase
+      const { data: saleData, error: saleError } = await db
         .from("sales")
         .insert({
           person_id: selectedCustomer?.id || null,

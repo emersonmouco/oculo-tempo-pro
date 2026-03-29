@@ -43,7 +43,7 @@ const Relatorios = () => {
           const d = subMonths(new Date(), i);
           const start = format(d, "yyyy-MM-01");
           const end = format(new Date(d.getFullYear(), d.getMonth() + 1, 0), "yyyy-MM-dd");
-          const { data } = await supabase
+          const { data } = await db
             .from("sales")
             .select("total")
             .eq("status", "finalizada")

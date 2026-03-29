@@ -30,7 +30,7 @@ const Financeiro = () => {
       const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
       const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59).toISOString();
 
-      const { data: sales } = await supabase
+      const { data: sales } = await db
         .from("sales")
         .select("total, payment_method")
         .eq("status", "finalizada")

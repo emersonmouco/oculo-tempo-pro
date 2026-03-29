@@ -61,7 +61,7 @@ const Relatorios = () => {
 
         const startOfMonth = format(new Date(new Date().getFullYear(), new Date().getMonth(), 1), "yyyy-MM-dd");
         const endOfMonth = format(new Date(), "yyyy-MM-dd");
-        const { data: salesMonth } = await supabase
+        const { data: salesMonth } = await db
           .from("sales")
           .select("total, payment_method")
           .eq("status", "finalizada")

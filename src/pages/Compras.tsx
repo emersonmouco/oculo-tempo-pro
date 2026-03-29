@@ -26,7 +26,7 @@ const Compras = () => {
 
   const loadProducts = async () => {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await db
         .from("products")
         .select("id, name, stock_quantity, min_stock_level, category")
         .eq("is_active", true);

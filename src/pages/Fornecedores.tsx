@@ -66,7 +66,7 @@ const Fornecedores = () => {
 
   const loadFornecedores = async () => {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await db
         .from("legal_persons")
         .select(`
           id,

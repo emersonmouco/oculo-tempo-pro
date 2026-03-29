@@ -93,7 +93,7 @@ export function ClientForm() {
       if (personError) throw personError;
 
       // Then, insert the legal person
-      const { error: legalPersonError } = await supabase
+      const { error: legalPersonError } = await db
         .from("legal_persons")
         .insert({
           person_id: personData.id,

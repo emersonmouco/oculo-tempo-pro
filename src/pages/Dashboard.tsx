@@ -43,7 +43,7 @@ const Dashboard = () => {
           .select("id", { count: "exact", head: true })
           .eq("is_active", true);
 
-        const { data: products } = await supabase
+        const { data: products } = await db
           .from("products")
           .select("stock_quantity");
 

@@ -301,7 +301,7 @@ const PDV = () => {
 
       // Movimentação de estoque
       for (const item of cart) {
-        await supabase
+        await db
           .from("products")
           .update({ stock_quantity: item.product.stock_quantity - item.quantity })
           .eq("id", item.product.id);

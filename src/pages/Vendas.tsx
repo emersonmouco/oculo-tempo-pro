@@ -97,7 +97,7 @@ const Vendas = () => {
 
       setStats({ vendasHoje, transacoesHoje, ticketMedio });
 
-      const { data, error } = await supabase
+      const { data, error } = await db
         .from("sales")
         .select(`
           id,

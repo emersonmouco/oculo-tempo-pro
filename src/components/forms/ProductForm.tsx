@@ -95,7 +95,7 @@ export function ProductForm({ onSuccess }: { onSuccess?: () => void }) {
   const onSubmit = async (data: ProductFormData) => {
     setIsLoading(true);
     try {
-      const { error } = await supabase
+      const { error } = await db
         .from("products")
         .insert({
           name: data.name,

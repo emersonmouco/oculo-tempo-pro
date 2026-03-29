@@ -70,7 +70,7 @@ const Produtos = () => {
 
   const loadProducts = async () => {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await db
         .from("products")
         .select("*")
         .order("created_at", { ascending: false });

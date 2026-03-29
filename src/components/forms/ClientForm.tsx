@@ -78,7 +78,7 @@ export function ClientForm() {
     setIsLoading(true);
     try {
       // First, insert the person
-      const { data: personData, error: personError } = await supabase
+      const { data: personData, error: personError } = await db
         .from("persons")
         .insert({
           name: data.name,

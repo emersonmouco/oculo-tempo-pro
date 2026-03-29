@@ -83,7 +83,7 @@ const Vendas = () => {
     setIsLoading(true);
     try {
       const today = format(new Date(), "yyyy-MM-dd");
-      const { data: todayData } = await supabase
+      const { data: todayData } = await db
         .from("sales")
         .select("id, total")
         .eq("status", "finalizada")

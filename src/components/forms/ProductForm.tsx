@@ -79,7 +79,7 @@ export function ProductForm({ onSuccess }: { onSuccess?: () => void }) {
 
   const loadSuppliers = async () => {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await db
         .from("legal_persons")
         .select("id, company_name, trade_name")
         .eq("is_active", true)

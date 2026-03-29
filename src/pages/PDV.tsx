@@ -33,7 +33,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { supabase } from "@/integrations/supabase/client";
+import { db } from "@/integrations/supabase/db";
 import { seedProducts } from "@/utils/seedProducts";
 import { useToast } from "@/hooks/use-toast";
 import {

@@ -20,7 +20,7 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { supabase } from "@/integrations/supabase/client";
+import { db } from "@/integrations/supabase/db";
 import { ProductForm } from "@/components/forms/ProductForm";
 import { 
   Search, 

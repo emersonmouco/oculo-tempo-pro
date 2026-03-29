@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Package, Save } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { db } from "@/integrations/supabase/db";
 import { useToast } from "@/hooks/use-toast";
 
 import { Button } from "@/components/ui/button";

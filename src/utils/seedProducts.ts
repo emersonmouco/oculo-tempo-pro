@@ -1,4 +1,4 @@
-import { supabase } from "@/integrations/supabase/client";
+import { db } from "@/integrations/supabase/db";
 
 const SEED_PRODUCTS = [
   { name: 'Armação Ray-Ban Aviator', sku: 'ARM-RB-001', barcode: '7891234567890', category: 'Armação', brand: 'Ray-Ban', model: 'Aviator RB3025', sale_price: 899.90, cost_price: 450.00, stock_quantity: 15, color: 'Dourado', material: 'Metal', warranty_period_months: 12, min_stock_level: 3 },

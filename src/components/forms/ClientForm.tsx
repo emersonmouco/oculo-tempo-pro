@@ -5,7 +5,7 @@ import { z } from "zod";
 import { format } from "date-fns";
 import { CalendarIcon, Save, User, Building2 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { supabase } from "@/integrations/supabase/client";
+import { db } from "@/integrations/supabase/db";
 import { useToast } from "@/hooks/use-toast";
 
 import { Button } from "@/components/ui/button";

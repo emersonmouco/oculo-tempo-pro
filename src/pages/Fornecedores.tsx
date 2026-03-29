@@ -19,7 +19,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import { supabase } from "@/integrations/supabase/client";
+import { db } from "@/integrations/supabase/db";
 import { ClientForm } from "@/components/forms/ClientForm";
 import { 
   Search, 

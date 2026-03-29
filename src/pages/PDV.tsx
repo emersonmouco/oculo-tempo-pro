@@ -357,61 +357,64 @@ const PDV = () => {
           {/* Search */}
           <Card className="flex-shrink-0">
             <CardContent className="p-3">
-              <div className="flex gap-2">
-                <Popover open={searchOpen} onOpenChange={setSearchOpen}>
-                  <PopoverTrigger asChild>
-                    <div className="flex-1 relative">
-                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        ref={searchRef}
-                        placeholder="Buscar por nome, SKU, código de barras, marca..."
-                        className="pl-9 pr-9 h-11 text-base"
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        onFocus={() => setSearchOpen(true)}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter" && filteredProducts.length > 0) {
-                            addToCart(filteredProducts[0]);
-                          }
-                        }}
-                      />
-                      <Barcode className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    </div>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0" align="start">
-                    <Command>
-                      <CommandList>
-                        <CommandEmpty>Nenhum produto encontrado.</CommandEmpty>
-                        <CommandGroup>
-                          {filteredProducts.slice(0, 10).map((product) => (
-                            <CommandItem
-                              key={product.id}
-                              onSelect={() => addToCart(product)}
-                              className="flex justify-between cursor-pointer py-2"
-                            >
-                              <div className="flex items-center gap-2 flex-1 min-w-0">
-                                {isLowStock(product) && <AlertTriangle className="h-3 w-3 text-amber-500 flex-shrink-0" />}
-                                <div className="min-w-0">
-                                  <span className="truncate block text-sm font-medium">
-                                    {product.brand && product.model
-                                      ? `${product.brand} ${product.model}`
-                                      : product.name}
-                                  </span>
-                                  <span className="text-xs text-muted-foreground">
-                                    {product.sku} · Est: {product.stock_quantity}
-                                  </span>
-                                </div>
-                              </div>
-                              <span className="font-bold text-primary ml-2 flex-shrink-0">
-                                R$ {product.sale_price.toFixed(2)}
+              <div className="relative">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    ref={searchRef}
+                    placeholder="Buscar por nome, SKU, código de barras, marca..."
+                    className="pl-9 pr-9 h-11 text-base"
+                    value={searchQuery}
+                    onChange={(e) => {
+                      setSearchQuery(e.target.value);
+                      setSearchOpen(true);
+                    }}
+                    onFocus={() => setSearchOpen(true)}
+                    onBlur={() => setTimeout(() => setSearchOpen(false), 200)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && filteredProducts.length > 0) {
+                        addToCart(filteredProducts[0]);
+                      }
+                      if (e.key === "Escape") {
+                        setSearchOpen(false);
+                        searchRef.current?.blur();
+                      }
+                    }}
+                  />
+                  <Barcode className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                </div>
+                {searchOpen && searchQuery.length > 0 && (
+                  <div className="absolute z-50 top-full left-0 right-0 mt-1 bg-popover border rounded-md shadow-lg max-h-[300px] overflow-y-auto">
+                    {filteredProducts.length === 0 ? (
+                      <div className="py-6 text-center text-sm text-muted-foreground">Nenhum produto encontrado.</div>
+                    ) : (
+                      filteredProducts.slice(0, 10).map((product) => (
+                        <div
+                          key={product.id}
+                          onMouseDown={() => addToCart(product)}
+                          className="flex justify-between items-center cursor-pointer py-2 px-3 hover:bg-accent transition-colors"
+                        >
+                          <div className="flex items-center gap-2 flex-1 min-w-0">
+                            {isLowStock(product) && <AlertTriangle className="h-3 w-3 text-amber-500 flex-shrink-0" />}
+                            <div className="min-w-0">
+                              <span className="truncate block text-sm font-medium">
+                                {product.brand && product.model
+                                  ? `${product.brand} ${product.model}`
+                                  : product.name}
                               </span>
-                            </CommandItem>
-                          ))}
-                        </CommandGroup>
-                      </CommandList>
-                    </Command>
-                  </PopoverContent>
-                </Popover>
+                              <span className="text-xs text-muted-foreground">
+                                {product.sku} · Est: {product.stock_quantity}
+                              </span>
+                            </div>
+                          </div>
+                          <span className="font-bold text-primary ml-2 flex-shrink-0">
+                            R$ {product.sale_price.toFixed(2)}
+                          </span>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>

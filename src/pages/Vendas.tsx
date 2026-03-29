@@ -21,12 +21,12 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 import { db } from "@/integrations/supabase/db";
-import { 
-  ShoppingCart, 
+import {
+  ShoppingCart,
   Search,
   Eye,
   Printer,
-  Calculator
+  ClipboardList,
 } from "lucide-react";
 import { format } from "date-fns";
 
@@ -188,15 +188,17 @@ const Vendas = () => {
           <h1 className="text-3xl font-bold text-foreground">Vendas & PDV</h1>
           <p className="text-muted-foreground">Gerencie vendas e orçamentos</p>
         </div>
-        <div className="flex gap-3">
-          <Button variant="outline" className="flex items-center gap-2">
-            <Calculator className="h-4 w-4" />
-            Novo Orçamento
+        <div className="flex gap-3 flex-wrap">
+          <Button variant="outline" className="flex items-center gap-2" asChild>
+            <Link to="/nova-prevenda">
+              <ClipboardList className="h-4 w-4" />
+              Nova pré-venda
+            </Link>
           </Button>
           <Button asChild className="erp-button-primary flex items-center gap-2">
             <Link to="/pdv">
               <ShoppingCart className="h-4 w-4" />
-              Nova Venda
+              PDV / Caixa
             </Link>
           </Button>
         </div>

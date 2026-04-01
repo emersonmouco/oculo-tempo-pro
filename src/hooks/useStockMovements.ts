@@ -78,7 +78,7 @@ export function useStockMovements(productId?: string) {
     try {
       let query = db
         .from("stock_movements")
-        .select("*, products(name, sku, category)")
+        .select("*")
         .order("created_at", { ascending: false })
         .limit(300);
 
@@ -86,9 +86,35 @@ export function useStockMovements(productId?: string) {
         query = query.eq("product_id", productId);
       }
 
-      const { data, error } = await query;
-      if (error) throw error;
-      setMovements(data ?? []);
+      const { data: rows, error: movErr } = await query;
+      if (movErr) throw movErr;
+
+      const list = rows ?? [];
+      if (list.length === 0) {
+        setMovements([]);
+        return;
+      }
+
+      const ids = [...new Set(list.map((r) => r.product_id as string))];
+      const { data: prods, error: prodErr } = await db
+        .from("products")
+        .select("id, name, sku, category")
+        .in("id", ids);
+
+      if (prodErr) throw prodErr;
+
+      const productMap = new Map(
+        (prods ?? []).map((p) => [
+          p.id as string,
+          { name: p.name as string, sku: p.sku as string | null, category: p.category as string | null },
+        ])
+      );
+
+      const merged: StockMovement[] = list.map((row) => ({
+        ...(row as Omit<StockMovement, "products">),
+        products: productMap.get(row.product_id as string) ?? null,
+      }));
+      setMovements(merged);
     } catch (e) {
       console.error("useStockMovements.load:", e);
       toast({ title: "Erro ao carregar movimentações", variant: "destructive" });

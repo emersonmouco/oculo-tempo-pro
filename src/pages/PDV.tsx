@@ -381,10 +381,25 @@ const PDV = () => {
       if (saleError) throw saleError;
 
       for (const item of cart) {
+        const newQty = item.product.stock_quantity - item.quantity;
+
         await db
           .from("products")
-          .update({ stock_quantity: item.product.stock_quantity - item.quantity })
+          .update({ stock_quantity: newQty, updated_at: new Date().toISOString() })
           .eq("id", item.product.id);
+
+        // Registra movimentação de estoque para rastreabilidade completa
+        await db.from("stock_movements").insert({
+          product_id: item.product.id,
+          movement_type: "saida",
+          quantity: item.quantity,
+          previous_quantity: item.product.stock_quantity,
+          new_quantity: newQty,
+          reference_type: "venda",
+          reference_id: activePresaleId,
+          notes: `Venda ${saleData.sale_number ?? saleData.id.slice(0, 8)}`,
+          operator: sellerName || null,
+        });
       }
 
       toast({

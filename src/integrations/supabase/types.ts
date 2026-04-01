@@ -14,6 +14,166 @@ export type Database = {
   }
   public: {
     Tables: {
+      stock_movements: {
+        Row: {
+          id: string
+          product_id: string
+          movement_type: "entrada" | "saida" | "ajuste_positivo" | "ajuste_negativo" | "devolucao_cliente" | "devolucao_fornecedor"
+          quantity: number
+          previous_quantity: number
+          new_quantity: number
+          reference_type: "venda" | "compra" | "ajuste" | "devolucao" | "inventario" | null
+          reference_id: string | null
+          notes: string | null
+          operator: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          product_id: string
+          movement_type: "entrada" | "saida" | "ajuste_positivo" | "ajuste_negativo" | "devolucao_cliente" | "devolucao_fornecedor"
+          quantity: number
+          previous_quantity: number
+          new_quantity: number
+          reference_type?: "venda" | "compra" | "ajuste" | "devolucao" | "inventario" | null
+          reference_id?: string | null
+          notes?: string | null
+          operator?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          product_id?: string
+          movement_type?: "entrada" | "saida" | "ajuste_positivo" | "ajuste_negativo" | "devolucao_cliente" | "devolucao_fornecedor"
+          quantity?: number
+          previous_quantity?: number
+          new_quantity?: number
+          reference_type?: "venda" | "compra" | "ajuste" | "devolucao" | "inventario" | null
+          reference_id?: string | null
+          notes?: string | null
+          operator?: string | null
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stock_movements_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      purchase_orders: {
+        Row: {
+          id: string
+          order_number: string | null
+          supplier_id: string | null
+          status: "rascunho" | "enviado" | "confirmado" | "em_transito" | "recebido_parcial" | "recebido" | "cancelado"
+          order_date: string
+          expected_date: string | null
+          received_date: string | null
+          subtotal: number
+          discount: number
+          total: number
+          notes: string | null
+          operator: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          order_number?: string | null
+          supplier_id?: string | null
+          status?: "rascunho" | "enviado" | "confirmado" | "em_transito" | "recebido_parcial" | "recebido" | "cancelado"
+          order_date?: string
+          expected_date?: string | null
+          received_date?: string | null
+          subtotal?: number
+          discount?: number
+          total?: number
+          notes?: string | null
+          operator?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          order_number?: string | null
+          supplier_id?: string | null
+          status?: "rascunho" | "enviado" | "confirmado" | "em_transito" | "recebido_parcial" | "recebido" | "cancelado"
+          order_date?: string
+          expected_date?: string | null
+          received_date?: string | null
+          subtotal?: number
+          discount?: number
+          total?: number
+          notes?: string | null
+          operator?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "purchase_orders_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "legal_persons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      purchase_order_items: {
+        Row: {
+          id: string
+          purchase_order_id: string
+          product_id: string
+          quantity_ordered: number
+          quantity_received: number
+          unit_cost: number
+          subtotal: number
+          notes: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          purchase_order_id: string
+          product_id: string
+          quantity_ordered: number
+          quantity_received?: number
+          unit_cost: number
+          subtotal: number
+          notes?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          purchase_order_id?: string
+          product_id?: string
+          quantity_ordered?: number
+          quantity_received?: number
+          unit_cost?: number
+          subtotal?: number
+          notes?: string | null
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "purchase_order_items_purchase_order_id_fkey"
+            columns: ["purchase_order_id"]
+            isOneToOne: false
+            referencedRelation: "purchase_orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "purchase_order_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       legal_persons: {
         Row: {
           business_activity_code: string | null

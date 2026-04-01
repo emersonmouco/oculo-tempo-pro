@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { db } from "@/integrations/supabase/db";
 import { useToast } from "@/hooks/use-toast";
+import { isMissingRelationError, STOCK_SCHEMA_SETUP_HINT } from "@/lib/supabasePostgrest";
 
 export type MovementType =
   | "entrada"
@@ -117,7 +118,13 @@ export function useStockMovements(productId?: string) {
       setMovements(merged);
     } catch (e) {
       console.error("useStockMovements.load:", e);
-      toast({ title: "Erro ao carregar movimentações", variant: "destructive" });
+      toast({
+        title: isMissingRelationError(e)
+          ? "Tabela de movimentações não existe no Supabase"
+          : "Erro ao carregar movimentações",
+        description: isMissingRelationError(e) ? STOCK_SCHEMA_SETUP_HINT : undefined,
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
@@ -177,7 +184,13 @@ export function useStockMovements(productId?: string) {
         return true;
       } catch (e) {
         console.error("useStockMovements.createMovement:", e);
-        toast({ title: "Erro ao registrar movimentação", variant: "destructive" });
+        toast({
+          title: isMissingRelationError(e)
+            ? "Tabela de movimentações não existe no Supabase"
+            : "Erro ao registrar movimentação",
+          description: isMissingRelationError(e) ? STOCK_SCHEMA_SETUP_HINT : undefined,
+          variant: "destructive",
+        });
         return false;
       }
     },

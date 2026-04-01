@@ -37,6 +37,7 @@ import {
 } from "lucide-react";
 import { db } from "@/integrations/supabase/db";
 import { useToast } from "@/hooks/use-toast";
+import { isMissingRelationError, STOCK_SCHEMA_SETUP_HINT } from "@/lib/supabasePostgrest";
 import {
   useStockMovements,
   movementTypeLabel,
@@ -226,7 +227,13 @@ const Estoque = () => {
       await Promise.all([loadProducts(), loadMovements()]);
     } catch (e) {
       console.error(e);
-      toast({ title: "Erro ao registrar movimentação", variant: "destructive" });
+      toast({
+        title: isMissingRelationError(e)
+          ? "Tabela de movimentações não existe no Supabase"
+          : "Erro ao registrar movimentação",
+        description: isMissingRelationError(e) ? STOCK_SCHEMA_SETUP_HINT : undefined,
+        variant: "destructive",
+      });
     } finally {
       setSavingAdj(false);
     }

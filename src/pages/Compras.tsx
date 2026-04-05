@@ -139,7 +139,7 @@ const Compras = () => {
   const filteredOrders = orders.filter((o) => {
     const q = searchOrders.trim().toLowerCase();
     const num = (o.order_number ?? "").toLowerCase();
-    const supp = supplierLabel(o.legal_persons ?? { id: "", trade_name: null, company_name: null }).toLowerCase();
+    const supp = supplierLabel((o.legal_persons as SupplierOption) ?? { id: "", trade_name: null, company_name: null }).toLowerCase();
     const matchQ = !q || num.includes(q) || supp.includes(q);
     const matchS = filterOrderStatus === "todos" || o.status === filterOrderStatus;
     return matchQ && matchS;
